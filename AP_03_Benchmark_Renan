@@ -1,0 +1,66 @@
+import random
+import AulasPraticas.AP_03_ordenacao as ap3
+import sys
+import time
+
+sys.setrecursionlimit(10**6)
+
+# Retorna uma lista aletória com os números de 1 a N
+def avg_case(N):
+
+    # Criação de uma lista com númeoros de 1 a N usando list comprehession
+    original = [x for x in range(N)]
+    my_list = []
+
+    # Usa o fato de quando uma lista fica vazia se compportar como valor de False quando possui 0 elementos
+    while len(original):
+        random_index = random.randint(0,len(original) - 1) # Pega um indice aleatório da lista que criamos
+        my_list.append(original[random_index]) # Adiciona o elemento aletório que acabei de pegar na lista vazia
+        original[random_index], original[-1] = original[-1], original[random_index] # Inverte o último termo com o termo que acabei de adicionar em my_list, para que ele seja excluido
+        original.pop(-1)
+    return my_list # Retorna a lista com números aletórios
+
+def gera_worst_case_quick(N):
+    return [x for x in range(N)][::-1] # Pego uma lista que vai de 1 a N e coloco ao contrário (pior caso)
+
+def perf_algo(sort_algo, N, k, worst_case_fun = None):
+    times = []
+    for _ in range(k):
+        # 
+        my_list = worst_case_fun(N) if worst_case_fun else avg_case(N)
+        start_t = time.perf_counter()
+        sort_algo(my_list)
+        end_t = time.perf_counter()
+        times.append(end_t - start_t)
+    return sum(times)/k
+
+comparações = [500, 1000, 5000, 10000]
+
+for i in range(len(comparações)):
+
+    print(f"""
+Teste {i + 1} para {comparações[i]} listas (Quick Sort):
+Caso médio: {perf_algo(ap3.quick_sort, comparações[i], 50)} ms
+Pior caso: {perf_algo(ap3.quick_sort, comparações[i], 50, gera_worst_case_quick)} ms
+    """)
+
+    print(f"""
+Teste {i + 1} para {comparações[i]} listas (Merge Sort(Divide and Conquer)):
+{perf_algo(ap3.divide_and_conquer_sort, comparações[i], 50)} ms
+    """)
+
+    print(f"""
+Teste {i + 1} para {comparações[i]} listas (Select Sort):
+{perf_algo(ap3.selection_sort, comparações[i], 50)} ms
+    """)
+
+
+"""print("Benchmark no método Quick Sort:")
+print(f"Caso médio: {perf_algo(ap3.quick_sort, 10000, 50)} ms")
+print(f"Pior caso: {perf_algo(ap3.quick_sort, 10000, 50, gera_worst_case_quick)} ms")
+
+print("Benchmark no método Divide and Conquer:")
+print(f"{perf_algo(ap3.divide_and_conquer_sort, 10000, 50)}ms")
+
+print("Benchmarl no método Selection Sort:")
+print(f"{perf_algo(ap3.selection_sort, 10000, 50)}ms")"""
